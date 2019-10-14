@@ -18,7 +18,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
 
 const Routes = () => {
   return (
-    <div>
+    <div className="routes">
       <Route exact path="/" component={Login} />
       <PrivateRoute path="/bubble-page" component={BubblePage} />
     </div>

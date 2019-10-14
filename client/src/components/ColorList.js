@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axiosWithAuth from '../utils/axiosWithAuth';
+import { Form, Input, Button, Icon } from 'semantic-ui-react';
 
 const initialColor = {
   color: "",
@@ -7,9 +8,9 @@ const initialColor = {
 };
 
 const ColorList = ({ colors, updateColors }) => {
-  console.log(colors);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+  const [colorToAdd, setColorToAdd] = useState(initialColor);
 
   const editColor = color => {
     setEditing(true);
@@ -47,9 +48,34 @@ const ColorList = ({ colors, updateColors }) => {
       .catch(err => console.log(err));
   };
 
+  const handleSubmit = e => {
+    e.preventDefault();
+    axiosWithAuth()
+      .post('/colors', colorToAdd)
+      .then(res => {
+        updateColors(res.data);
+        setColorToAdd(initialColor);
+     })
+     .catch(err => console.log(err));
+  }
+  
+  const handleChangeColorName = e => {
+    setColorToAdd({
+      ...colorToAdd,
+      color: e.target.value
+    })
+  }
+
+  const handleChangeColorCode = e => {
+    setColorToAdd({
+      ...colorToAdd,
+      code: { hex: e.target.value }
+    })
+  }
+
   return (
     <div className="colors-wrap">
-      <p>colors</p>
+      <h2>Colors</h2>
       <ul>
         {colors.map(color => (
           <li key={color.color} onClick={() => editColor(color)}>
@@ -96,8 +122,31 @@ const ColorList = ({ colors, updateColors }) => {
           </div>
         </form>
       )}
+      {!editing && (
+        <Form onSubmit={handleSubmit}>
+          <h3>Add Color</h3>
+          <Form.Field>
+            <label>Color Name:</label>
+            <Input 
+              type="text"
+              placeholder="Color Name"
+              onChange={handleChangeColorName}
+              value={colorToAdd.color}
+            />
+          </Form.Field>
+          <Form.Field>
+            <label>Color Hex:</label>
+            <Input 
+              type="text"
+              placeholder="Color Hex"
+              onChange={handleChangeColorCode}
+              value={colorToAdd.code.hex}
+            />
+          </Form.Field>
+          <Button positive><Icon name="add" />Add</Button>
+        </Form>
+      )}
       <div className="spacer" />
-      {/* stretch - build another form here to add a color */}
     </div>
   );
 };
